@@ -257,7 +257,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📧 Contact
 
 For questions or support, please open an issue on GitHub.
-
----
+Dr. Vicente Esparza Villalpando
 
 **Made with ❤️ for researchers, by researchers**
+
