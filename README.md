@@ -263,4 +263,5 @@ Dr. Vicente Esparza Villalpando
 
 ## 📧 Citation
 
-Esparza-Villalpando V. RevAutoSearch: Disponible en: https://github.com/Vicentemed/RevAutoSearch
+Esparza-Villalpando V. RevAutoSearch: https://github.com/Vicentemed/RevAutoSearch
+
