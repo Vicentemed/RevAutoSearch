@@ -261,3 +261,6 @@ Dr. Vicente Esparza Villalpando
 
 **Made with ❤️ for researchers, by researchers**
 
+## 📧 Citation
+
+Esparza-Villalpando V. RevAutoSearch: Disponible en: https://github.com/Vicentemed/RevAutoSearch
