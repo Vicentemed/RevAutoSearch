@@ -66,11 +66,7 @@ echo 🌍 Subiendo cambios al repositorio remoto...
 git push -u origin %RAMA%
 
 if errorlevel 1 (
-    echo ❌ Hubo un problema al subir los archivos.
-    echo Verifica tu conexión o tus credenciales de GitHub.
-    echo Si es la primera vez, usa un token personal como contraseña.
-    pause
-    exit /b
+    
 )
 
 echo.
