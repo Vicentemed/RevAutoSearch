@@ -1,10 +1,10 @@
-# AutoRevAG - Automated Review & Abstract Gatherer
+# RevAutoSearch - Automated Review & Abstract Gatherer
 
 [![R](https://img.shields.io/badge/R-4.0+-blue.svg)](https://www.r-project.org/)
 [![Shiny](https://img.shields.io/badge/Shiny-1.7+-green.svg)](https://shiny.rstudio.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-**AutoRevAG** is a powerful Shiny application for automated academic literature search and abstract retrieval. It combines multiple academic databases (Google Scholar, EuropePMC, Semantic Scholar, CrossRef, and PubMed) to provide comprehensive metadata and complete abstracts for biomedical and scientific research.
+**RevAutoSearch** is a powerful Shiny application for automated academic literature search and abstract retrieval. It combines multiple academic databases (Google Scholar, EuropePMC, Semantic Scholar, CrossRef, and PubMed) to provide comprehensive metadata and complete abstracts for biomedical and scientific research.
 
 ## 🎯 Features
 
@@ -35,8 +35,8 @@
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/AutoRevAG.git
-cd AutoRevAG
+git clone https://github.com/yourusername/RevAutoSearch.git
+cd RevAutoSearch
 ```
 
 ### 2. Install Required R Packages
@@ -87,7 +87,7 @@ Sys.setenv(ENTREZ_EMAIL = "your_email")
 
 ```r
 library(shiny)
-runApp("path/to/AutoRevAG")
+runApp("path/to/RevAutoSearch")
 ```
 
 Or from RStudio:
@@ -264,4 +264,5 @@ Dr. Vicente Esparza Villalpando
 ## 📧 Citation
 
 Esparza-Villalpando V. RevAutoSearch: https://github.com/Vicentemed/RevAutoSearch
+
 
