@@ -1,0 +1,34 @@
+setwd("C:/Escritorio 2026/CARPETAS/RevAutoSearch")
+
+
+library(rsconnect)
+
+rsconnect::setAccountInfo(name='0804ot-vicente-esparza',
+			  token='C2B0C456583116A7171B7056801F339E',
+			  secret='VN24wsmlOETvAf7rbZQ/R3N/UTkmew0ibwtDGWXb')
+
+rsconnect::deployApp()
+
+###################################### LOCAL
+
+install.packages(c("shiny","rentrez","xml2","rvest","jsonlite","dplyr","DT","openxlsx","readr"))
+
+serpapi_key <- Sys.getenv("ae2e04f8aa41a952afbf563c6147a69e93b11c9099e272f699cad26d67317760")
+entrez_key  <- Sys.getenv("df7907a10344895b6938cf5bc71236841f07")
+entrez_email <- Sys.getenv("vev.dds@gmail.com")
+
+
+SERPAPI_KEY<-ae2e04f8aa41a952afbf563c6147a69e93b11c9099e272f699cad26d67317760
+ENTREZ_KEY<-df7907a10344895b6938cf5bc71236841f07
+ENTREZ_EMAIL<-vev.dds@gmail.com
+
+
+setwd("E:/Escritorio 2025/RevAutoSearch")
+
+shiny::runApp()
+
+tramadol AND endodontic pain AND local AND root canal treatment
+
+cognitive impairment AND saliva AND lactoferrin AND Beta amyloid AND phosphorylated tau
+
+(dental anesthetic OR dental anaesthetic OR dental anesthesia OR dental anaesthesia) AND (paediatric OR pediatric OR child OR children) AND pain
