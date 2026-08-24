@@ -10,3 +10,6 @@ pubmed_email.txt
 
 # Metadatos de despliegue de shinyapps.io (contienen ids de cuenta)
 rsconnect/
+
+# Estado local que escribe la app
+historial_busquedas.csv
