@@ -1,0 +1,12 @@
+# Claves y credenciales de APIs: nunca deben entrar al repositorio
+serp_key.txt
+pubmed_key.txt
+pubmed_email.txt
+
+# Archivos de sesión de R / RStudio
+.Rhistory
+.RData
+.Rproj.user/
+
+# Metadatos de despliegue de shinyapps.io (contienen ids de cuenta)
+rsconnect/
