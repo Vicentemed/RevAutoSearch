@@ -724,6 +724,28 @@ server <- function(input, output, session) {
       final_df <- final_df %>% mutate(year_num = suppressWarnings(as.numeric(year))) %>%
         filter(is.na(year_num) | year_num >= input$year_min) %>%
         select(-year_num)
+      # Filtro de nombres de revista: descarta registros cuyo "título" es exactamente
+      # el nombre de una revista (p.ej. buscar "gerodontology" satura con entradas de
+      # la revista, no artículos). Se compara el título normalizado contra el conjunto
+      # de nombres de revista presentes en los propios resultados.
+      if (nrow(final_df) > 0) {
+        journal_norms <- vapply(final_df$journal, function(j) {
+          v <- normalize_title(j)
+          if (is.na(v)) "" else v
+        }, character(1), USE.NAMES = FALSE)
+        title_norms <- vapply(final_df$title, function(t) {
+          v <- normalize_title(t)
+          if (is.na(v)) "" else v
+        }, character(1), USE.NAMES = FALSE)
+        conocidas <- unique(journal_norms[nzchar(journal_norms)])
+        es_revista <- nzchar(title_norms) & title_norms %in% conocidas
+        if (any(es_revista)) {
+          append_log(paste0("Filtrados ", sum(es_revista),
+                            " registros cuyo título es solo el nombre de una revista: ",
+                            paste(unique(final_df$title[es_revista]), collapse = "; ")))
+          final_df <- final_df[!es_revista, , drop = FALSE]
+        }
+      }
       # incluir el criterio de búsqueda utilizado, ligado a esta corrida
       if (nrow(final_df) > 0) final_df$criterio_busqueda <- query
       # ensure UTF-8 and remove empty strings -> NA
