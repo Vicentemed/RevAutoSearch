@@ -523,6 +523,26 @@ resolve_title_to_metadata <- function(title_raw, title_norm, log_fun = NULL) {
 }
 
 # -------------------- 5. PubMed direct search (by keywords) --------------------
+# Restringe la consulta a título y resumen ([tiab]). Sin esto, el mapeo automático
+# de términos de PubMed resuelve palabras como "gerodontology" contra el campo de
+# revista y devuelve el contenido completo de la publicación homónima, no artículos
+# sobre el tema. Con [tiab] el campo de revista queda fuera y además se recuperan
+# artículos que llevan el término en el título pero se publicaron en otra revista.
+build_pubmed_query <- function(q) {
+  q <- trimws(q)
+  if (!nzchar(q)) return(q)
+  # si el usuario ya escribió etiquetas de campo Entrez ([tiab], [Title], [MeSH]...),
+  # respetar su consulta tal cual
+  if (grepl("\\[[A-Za-z /]+\\]", q)) return(q)
+  # tokenizar respetando frases entre comillas
+  tokens <- regmatches(q, gregexpr('"[^"]+"|\\S+', q))[[1]]
+  out <- vapply(tokens, function(tk) {
+    if (toupper(tk) %in% c("AND", "OR", "NOT")) return(toupper(tk))
+    paste0(tk, "[tiab]")
+  }, character(1), USE.NAMES = FALSE)
+  paste(out, collapse = " ")
+}
+
 pubmed_search_direct <- function(query, retmax = 200, log_fun = NULL) {
   empty_res <- tibble::tibble(
     title = character(), year = character(), doi = character(), url = character(),
@@ -670,7 +690,9 @@ server <- function(input, output, session) {
       append_log(paste("Registros resueltos desde GS:", nrow(df_gs)))
       # 3) PubMed overall search for query (add missing)
       incProgress(0.05, detail = "Buscando PubMed (consulta global)...")
-      pm_all <- tryCatch(pubmed_search_direct(query, retmax = input$pubmed_max, log_fun = append_log), error = function(e) { 
+      query_pubmed <- build_pubmed_query(query)
+      append_log(paste("Consulta PubMed:", query_pubmed))
+      pm_all <- tryCatch(pubmed_search_direct(query_pubmed, retmax = input$pubmed_max, log_fun = append_log), error = function(e) {
         append_log(paste("Error PubMed direct:", e$message))
         tibble::tibble(title = character(), year = character(), doi = character(), url = character(), abstract = character(), journal = character(), source = character(), title_norm = character())
       })
@@ -724,28 +746,6 @@ server <- function(input, output, session) {
       final_df <- final_df %>% mutate(year_num = suppressWarnings(as.numeric(year))) %>%
         filter(is.na(year_num) | year_num >= input$year_min) %>%
         select(-year_num)
-      # Filtro de nombres de revista: descarta registros cuyo "título" es exactamente
-      # el nombre de una revista (p.ej. buscar "gerodontology" satura con entradas de
-      # la revista, no artículos). Se compara el título normalizado contra el conjunto
-      # de nombres de revista presentes en los propios resultados.
-      if (nrow(final_df) > 0) {
-        journal_norms <- vapply(final_df$journal, function(j) {
-          v <- normalize_title(j)
-          if (is.na(v)) "" else v
-        }, character(1), USE.NAMES = FALSE)
-        title_norms <- vapply(final_df$title, function(t) {
-          v <- normalize_title(t)
-          if (is.na(v)) "" else v
-        }, character(1), USE.NAMES = FALSE)
-        conocidas <- unique(journal_norms[nzchar(journal_norms)])
-        es_revista <- nzchar(title_norms) & title_norms %in% conocidas
-        if (any(es_revista)) {
-          append_log(paste0("Filtrados ", sum(es_revista),
-                            " registros cuyo título es solo el nombre de una revista: ",
-                            paste(unique(final_df$title[es_revista]), collapse = "; ")))
-          final_df <- final_df[!es_revista, , drop = FALSE]
-        }
-      }
       # incluir el criterio de búsqueda utilizado, ligado a esta corrida
       if (nrow(final_df) > 0) final_df$criterio_busqueda <- query
       # ensure UTF-8 and remove empty strings -> NA
