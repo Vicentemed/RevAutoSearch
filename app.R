@@ -14,6 +14,7 @@ library(dplyr)
 library(stringr)
 library(DT)
 library(readr)
+library(writexl)
 # -------------------- 0. Leer API keys (archivo o env) --------------------
 read_key_safe <- function(path) {
   if (nzchar(Sys.getenv(path))) return(Sys.getenv(path))
@@ -582,7 +583,7 @@ ui <- fluidPage(
       sliderInput("year_min", "Año mínimo:", min = 1900, max = as.integer(format(Sys.Date(), "%Y")), value = 2000),
       actionButton("run", "Ejecutar pipeline"),
       br(), br(),
-      downloadButton("download_csv", "Descargar CSV (abstracts completos)"),
+      downloadButton("download_xlsx", "Descargar Excel (abstracts completos)"),
       br(), br(),
       verbatimTextOutput("log")
     ),
@@ -723,6 +724,8 @@ server <- function(input, output, session) {
       final_df <- final_df %>% mutate(year_num = suppressWarnings(as.numeric(year))) %>%
         filter(is.na(year_num) | year_num >= input$year_min) %>%
         select(-year_num)
+      # incluir el criterio de búsqueda utilizado, ligado a esta corrida
+      if (nrow(final_df) > 0) final_df$criterio_busqueda <- query
       # ensure UTF-8 and remove empty strings -> NA
       # Use vectorized logic properly. is.na(x) is vectorized.
       final_df <- final_df %>% mutate(across(everything(), ~ {
@@ -754,16 +757,22 @@ server <- function(input, output, session) {
       datatable(df, filter = "top", options = list(pageLength = 10, scrollX = TRUE), rownames = FALSE)
     }
   })
-  output$download_csv <- downloadHandler(
-    filename = function() paste0("results_full_abstracts_", Sys.Date(), ".csv"),
+  # Exportación en Excel (.xlsx): a diferencia del CSV, Excel lo abre siempre en UTF-8,
+  # así que los acentos y las eñes se muestran correctamente sin pasos intermedios
+  output$download_xlsx <- downloadHandler(
+    filename = function() paste0("resultados_articulos_", Sys.Date(), ".xlsx"),
     content = function(file) {
       df <- results_store()
       if (is.null(df) || nrow(df) == 0) {
-        readr::write_csv(dplyr::tibble(), file)
-      } else {
-        # write UTF-8 CSV
-        readr::write_csv(df, file)
+        writexl::write_xlsx(list(Resultados = dplyr::tibble(mensaje = "Sin resultados")), path = file)
+        return()
       }
+      criterio <- if ("criterio_busqueda" %in% names(df)) df$criterio_busqueda[1] else NA_character_
+      hoja_busqueda <- dplyr::tibble(
+        campo = c("Criterio de búsqueda", "Fecha de descarga", "Registros"),
+        valor = c(ifelse(is.na(criterio), "", criterio), as.character(Sys.Date()), as.character(nrow(df)))
+      )
+      writexl::write_xlsx(list(Resultados = df, Busqueda = hoja_busqueda), path = file)
     }
   )
   output$log <- renderText({ paste(logs(), collapse = "\n") })
