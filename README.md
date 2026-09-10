@@ -264,5 +264,6 @@ Dr. Vicente Esparza Villalpando
 ## 📧 Citation
 
 Esparza-Villalpando V. RevAutoSearch: https://github.com/Vicentemed/RevAutoSearch
+DOI: 10.5281/zenodo.22695284 
 
 
